@@ -4,7 +4,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Register.css';
-import {useLocation,useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 
 const validateField = (name, value, formData) => {
     switch (name) {
@@ -48,7 +48,6 @@ const validateField = (name, value, formData) => {
             return '';
     }
 };
-
 function Register() {
     const navigate = useNavigate();
     const [validated, setValidated] = useState(false);
@@ -61,7 +60,7 @@ function Register() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState({});
-    const [passwordValid, setPasswordValid] = useState(true); // New state for password validity
+    const [passwordValid, setPasswordValid] = useState(true);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -70,7 +69,6 @@ function Register() {
             const errorMessage = validateField(name, value, updatedFormData);
 
             if (name === 'password') {
-                // Check if the password is valid and update the state
                 const isPasswordValid = !errorMessage;
                 setPasswordValid(isPasswordValid);
             }
@@ -104,7 +102,6 @@ function Register() {
         setLoading(true);
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, formData);
-            console.log("response = ", response);
             if (response.status === 201) {
                 toast.success('Registration successful!');
                 setFormData({
@@ -116,19 +113,23 @@ function Register() {
                 setErrors({});
                 setSuccess({});
                 setValidated(false);
-                navigate('/management_dashboard');
+                navigate('/login');
             }
         } catch (err) {
-            console.log("hello");
-            const errorMessage = err.message || 'Registration failed';
-            setErrors({ form: errorMessage });
-            toast.error('Registration failed!');
+            
+            const emailExist = err.response?.data?.hasOwnProperty('email')
+            if(emailExist){
+                const errorMessage = err.response.data.email[0] || 'Registration failed';
+                setErrors({ form: errorMessage });
+                toast.error('Registration failed!');
+            }
+            
         } finally {
             setLoading(false);
         }
     };
 
-    const isFormInvalid = !Object.values(errors).every(error => !error) || loading;
+    const isFormInvalid = loading || Object.values(errors).some(error => error);
 
     return (
         <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
@@ -154,7 +155,7 @@ function Register() {
                                 isValid={success[field]}
                                 required
                                 autoComplete='off'
-                                disabled={field === 'confirmPassword' && !passwordValid} // Disable confirmPassword field
+                                disabled={field === 'confirmPassword' && !passwordValid}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {errors[field]}
@@ -170,7 +171,7 @@ function Register() {
                         className="w-100 mt-3"
                         disabled={isFormInvalid}
                     >
-                        Register
+                        {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Register'}
                     </Button>
                 </Form>
                 <ToastContainer />

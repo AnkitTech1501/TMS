@@ -1,0 +1,8 @@
+
+.card-img-top{
+    width:55%;
+    height: 150px !important;
+}
+.customCard{
+    --bs-card-border-color: : none !important;
+}

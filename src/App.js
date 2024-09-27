@@ -14,6 +14,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path = "/management_dashboard" element = {<ManagementDashboard />} />
+        <Route path = "/login" element = {<Login />} />
         {/* <PrivateRoute path="/home" component={Home} /> */}
         {/* <Redirect from="/" to="/home" /> */}
       </Routes>
